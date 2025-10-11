@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>VOCE AINDA DESCASCA MANGA?</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        /* Reset styles for email clients */
+        body, table, td, p, a, li, blockquote {
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+        }
+        table, td {
+            mso-table-lspace: 0pt;
+            mso-table-rspace: 0pt;
+        }
+        img {
+            -ms-interpolation-mode: bicubic;
+        }
+
+        /* Main styles */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333333;
+            background-color: #f8f9fa;
+        }
+
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            padding: 30px 40px 20px;
+            text-align: center;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #FF6B35;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .letter-content {
+            padding: 40px;
+            background-color: #ffffff;
+        }
+
+        .date {
+            text-align: right;
+            font-size: 14px;
+            color: #666666;
+            margin-bottom: 30px;
+            font-style: italic;
+        }
+
+        .greeting {
+            font-size: 18px;
+            margin-bottom: 25px;
+            color: #333333;
+        }
+
+        .letter-body {
+            font-size: 16px;
+            line-height: 1.7;
+            margin-bottom: 30px;
+        }
+
+        .letter-body p {
+            margin-bottom: 20px;
+        }
+
+        .letter-body h3 {
+            color: #FF6B35;
+            font-size: 18px;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+
+        .highlight {
+            color: #FF6B35;
+            font-weight: 600;
+        }
+
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 aspect ratio */
+            height: 0;
+            overflow: hidden;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .banner-image {
+            width: 100%;
+            max-width: 100%;
+            height: auto;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        .closing {
+            margin-top: 40px;
+            margin-bottom: 10px;
+        }
+
+        .signature-section {
+            margin-top: 30px;
+        }
+
+        .signature-text {
+            font-size: 16px;
+            color: #333333;
+            margin-bottom: 5px;
+        }
+
+        .signature-title {
+            font-size: 14px;
+            color: #666666;
+            font-style: italic;
+        }
+
+        .handwritten-signature {
+            display: inline-block;
+            margin: 20px 0 5px 0;
+            transform: rotate(-2deg);
+        }
+
+        .handwritten-signature svg {
+            width: 180px;
+            height: auto;
+            opacity: 0.9;
+        }
+
+        /* Digital signature block */
+        .digital-signature {
+            margin-top: 30px;
+            border-left: 3px solid #e9ecef;
+            padding-left: 12px;
+        }
+        .digital-signature, .digital-signature * {
+            font-family: 'Inter', Arial, sans-serif !important;
+        }
+        .ds-name {
+            font-size: 16px;
+            color: #000000;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+        .ds-company-role {
+            font-size: 14px;
+            margin-bottom: 8px;
+            line-height: 1.2;
+        }
+        .ds-cell { display: table-cell; vertical-align: middle; }
+        .ds-company {
+            display: inline-block;
+            background-color: #FFF1EA;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+        .ds-role {
+            color: #000000;
+            font-weight: 500;
+        }
+        .ds-pipe { font-weight: 700; padding-right: 8px; }
+        .ds-sep { padding: 0 6px; }
+        .ds-logo-inline {
+            height: 22px;
+            width: auto;
+            vertical-align: middle;
+        }
+        .ds-tagline {
+            font-size: 14px;
+            color: #000000;
+            font-weight: 500;
+            margin-top: 6px;
+        }
+        .ds-logo img {
+            margin-top: 12px;
+            max-width: 120px;
+            height: auto;
+        }
+
+        .footer {
+            background-color: #f8f9fa;
+            padding: 25px 40px;
+            border-top: 1px solid #e9ecef;
+            text-align: center;
+        }
+
+        .footer-content {
+            font-size: 12px;
+            color: #666666;
+            line-height: 1.5;
+        }
+
+        .footer-content a {
+            color: #FF6B35;
+            text-decoration: none;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background-color: #FF6B35;
+            color: #ffffff;
+            padding: 15px 40px;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: 600;
+            margin: 20px 0;
+            transition: background-color 0.3s ease;
+            font-size: 16px;
+        }
+
+        .cta-button:hover {
+            background-color: #e5582a;
+        }
+
+        .cta-center {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        /* Mobile responsiveness */
+        @media only screen and (max-width: 600px) {
+            .email-container {
+                width: 100% !important;
+            }
+
+            .header, .letter-content, .footer {
+                padding: 20px !important;
+            }
+
+            .letter-body {
+                font-size: 15px;
+            }
+
+            .handwritten-signature svg {
+                width: 140px;
+            }
+
+            .ds-logo img {
+                max-width: 110px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+            <td align="center" style="padding: 20px 0;">
+                <table class="email-container" cellpadding="0" cellspacing="0" border="0">
+                    <!-- Letter Content -->
+                    <tr>
+                        <td class="letter-content">
+                            <div class="greeting">
+                                Olá {{nome}},
+                            </div>
+
+                            <div class="letter-body">
+                                <p>Meu nome é Henrique, CEO da Magic Mango, e hoje quero ter uma conversa direta com você. Antes de tudo, eu quero deixar claro que este não é apenas mais um e-mail com o objetivo de vender um produto ou fazer você assinar nossa plataforma. Você está recebendo esta mensagem porque faz parte da nossa história. Você foi um dos primeiros a acessar nossa landing page, a dar os primeiros cliques e nos fornecer feedbacks que ajudaram e <strong>muito</strong> a evoluir a plataforma nesses últimos meses.</p>
+
+                                <p>Recentemente, novas features foram introduzidas e construídas pensando na sua experiência, no resultado da sua empresa e na gestão do seu time:</p>
+
+                                <h3>Novo AI Chat</h3>
+                                <img src="https://magicmango-assets.s3.us-east-1.amazonaws.com/Chat+Question+2fps20.gif" alt="AI Chat Demo" class="banner-image">
+
+                                <h3>Boards Aninhados</h3>
+                                <img src="https://magicmango-assets.s3.us-east-1.amazonaws.com/Save+to+nested+board.gif" alt="Boards Aninhados Demo" class="banner-image">
+
+                                <h3>Clone Ads</h3>
+                                <img src="https://magicmango-assets.s3.us-east-1.amazonaws.com/Chat+Clone720fps20.gif" alt="Clone Ads Demo" class="banner-image">
+
+                                <p>Ao mesmo tempo que a plataforma vem avancando com foco em gerar cada vez mais valor para voce, a qualidade dos criativos disponíveis também tem sido uma prioridade. Por isso, tenho o prazer de compartilhar em primeira mão que <strong>hoje batemos uma marca histórica:</strong></p>
+
+                                <img src="https://raw.githubusercontent.com/TheMagicMango/assets/main/banner-convertion.png" alt="Banner de conversão" class="banner-image">
+
+                                <p>E isso é só o começo! Nossa visão de futuro, é que uma campanha de sucesso seja o resultado de uma equação bem definida, não um golpe de sorte.</p>
+
+                                <p>Mais do que fazer, nos queremos construir esse futuro junto das pessoas que nos trouxeram até aqui. É por isso que queremos que você seja um dos primeiros a testar essas novas features ja disponíveis e também as que serão lançadas em breve.</p>
+
+                                <p>Para isso, nada mais justo que uma oferta especial: <span class="highlight">1 MÊS GRÁTIS</span> com tudo o que a Magic Mango pode oferecer para você, para o seu negócio e para o seu time.</p>
+
+                                <p>Novamente, este não é um e-mail com o objetivo de fazer você assinar nossa plataforma. Queremos ter a certeza de que vamos gerar o máximo de valor possível para voce.</p>
+
+                                <p>Ja adiantando, o botão abaixo não vai te direcionar para uma página de checkout.</p>
+
+                                <p>Eu quero te convidar para uma call 1-a-1 comigo, para entender as suas dores no dia-a-dia da sua empresa e mostrar como a nossa plataforma pode reduzir seu custo de aquisição de clientes, aumentar sua distribuição, alavancar suas vendas e todos os outros benefícios que a engenharia criativa pode te oferecer.</p>
+
+                                <p>Clique no botão abaixo para agendar uma call comigo e garantir <span class="highlight">1 MÊS GRÁTIS de Magic Mango</span>.</p>
+
+                                <div class="cta-center">
+                                    <a href="https://calendar.app.google/KUgqSMjY1AM6qDvE7" class="cta-button">Agendar</a>
+                                </div>
+                            </div>
+
+                            <div class="closing">
+                                Vai ser um prazer construir isso junto com você, {{nome}}!
+                            </div>
+
+                            <div class="signature-section">
+                                <div class="signature-text">Atenciosamente,</div>
+                            </div>
+
+                            <div class="handwritten-signature" style="transform: rotate(-1deg);">
+                                <img src="https://raw.githubusercontent.com/TheMagicMango/assets/main/lemos-sign.png" alt="Henrique Lemos Signature" style="max-width: 120px; height: auto;">
+                            </div>
+                            <div class="digital-signature">
+                                <div class="ds-name">Henrique Lemos</div>
+                                <div class="ds-company-role">
+                                    <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                                        <tr>
+                                            <td valign="middle"><img src="https://raw.githubusercontent.com/TheMagicMango/assets/main/logo-banner-sign.png" alt="Magic Mango" class="ds-logo-inline"></td>
+                                            <td valign="middle" style="padding: 0 8px 0 10px;">-</td>
+                                            <td valign="middle"><span class="ds-role">CEO</span></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div class="ds-tagline">Transformando o marketing brasileiro, um anúncio de cada vez.</div>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

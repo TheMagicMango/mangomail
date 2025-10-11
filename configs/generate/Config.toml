@@ -1,0 +1,24 @@
+# MangoMail Configuration
+# This file defines all environment variables used by the MangoMail service
+
+# Service Configuration
+
+[service.MANGOMAIL_LOG_LEVEL]
+go-type = "LogLevel"
+default = "info"
+description = """Log level for the service (debug, info, warn, error)"""
+used-by = ["mangomail"]
+
+# Resend Configuration
+
+[resend.MANGOMAIL_RESEND_API_KEY]
+go-type = "RedactedString"
+file = true
+description = """Resend API key for sending emails. Can be loaded from file using MANGOMAIL_RESEND_API_KEY_FILE"""
+used-by = ["mangomail"]
+
+[resend.MANGOMAIL_RATE_LIMIT]
+go-type = "uint64"
+default = "2"
+description = """Maximum number of email requests per second (rate limit)"""
+used-by = ["mangomail"]
