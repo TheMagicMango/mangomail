@@ -92,6 +92,88 @@ mangomail campaign --resend-api-key "re_your_api_key_here" ...
 | `MANGOMAIL_RESEND_API_KEY_FILE` | Path to file containing API key | - |
 | `MANGOMAIL_RATE_LIMIT` | Max emails per second | `2` |
 | `MANGOMAIL_LOG_LEVEL` | Log level (debug, info, warn, error) | `info` |
+| `MANGOMAIL_API_KEY` | API key for HTTP API authentication | - |
+| `CORS_ALLOWED_ORIGINS` | Allowed origins for CORS (comma-separated) | `*` |
+
+## HTTP API
+
+MangoMail can also run as an HTTP API server for programmatic email sending.
+
+### Starting the Server
+
+```bash
+mangomail serve \
+  --from "hello@example.com" \
+  --port 8081 \
+  --template examples/template-email.html
+```
+
+**Required Environment Variables:**
+```bash
+export MANGOMAIL_RESEND_API_KEY="re_your_api_key_here"
+export MANGOMAIL_API_KEY="your_secret_api_key_here"
+```
+
+### API Endpoint
+
+**POST** `/api/v1/send`
+
+Send a single email using the configured template.
+
+**Headers:**
+- `Content-Type: application/json`
+- `X-API-Key: your_secret_api_key_here`
+
+**Request Body:**
+```json
+{
+  "to": "recipient@example.com",
+  "name": "John Doe",
+  "subject": "Welcome to our service",
+  "saudacao": "Hi John,",
+  "body": "Thank you for signing up!",
+  "assinatura": "Best regards,\nThe Team"
+}
+```
+
+**Response (Success):**
+```json
+{
+  "success": true,
+  "message": "Email sent successfully"
+}
+```
+
+**Response (Error):**
+```json
+{
+  "success": false,
+  "error": "Field 'to' must be a valid email address"
+}
+```
+
+### Example with cURL
+
+```bash
+curl -X POST http://localhost:8081/api/v1/send \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: your_secret_api_key_here" \
+  -d '{
+    "to": "user@example.com",
+    "name": "Alice",
+    "subject": "Hello {{name}}!",
+    "saudacao": "Hi {{name}},",
+    "body": "Welcome to our platform!",
+    "assinatura": "Cheers,\nThe Team"
+  }'
+```
+
+### Security Features
+
+- **API Key Authentication**: All requests require a valid `X-API-Key` header
+- **Rate Limiting**: Configurable rate limit (default: 2 requests/second)
+- **CORS**: Configurable allowed origins
+- **Input Validation**: Automatic validation of email format and field lengths
 
 ## Usage
 

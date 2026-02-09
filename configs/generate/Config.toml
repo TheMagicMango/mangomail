@@ -22,3 +22,17 @@ go-type = "uint64"
 default = "2"
 description = """Maximum number of email requests per second (rate limit)"""
 used-by = ["mangomail"]
+
+# HTTP API Configuration
+
+[http.MANGOMAIL_API_KEY]
+go-type = "RedactedString"
+file = true
+description = """API key for authenticating HTTP API requests. Can be loaded from file using MANGOMAIL_API_KEY_FILE"""
+used-by = ["mangomail"]
+
+[http.CORS_ALLOWED_ORIGINS]
+go-type = "string"
+default = "*"
+description = """Allowed origins for CORS (comma-separated list)"""
+used-by = ["mangomail"]

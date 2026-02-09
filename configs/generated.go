@@ -5,9 +5,10 @@ package configs
 
 import (
 	"fmt"
-	"github.com/spf13/viper"
 	"os"
 	"strings"
+
+	"github.com/spf13/viper"
 )
 
 var ErrNotDefined = fmt.Errorf("variable not defined")
@@ -18,17 +19,25 @@ func init() {
 }
 
 const (
+	CORS_ALLOWED_ORIGINS     = "CORS_ALLOWED_ORIGINS"
+	MANGOMAIL_API_KEY        = "MANGOMAIL_API_KEY"
 	MANGOMAIL_RATE_LIMIT     = "MANGOMAIL_RATE_LIMIT"
 	MANGOMAIL_RESEND_API_KEY = "MANGOMAIL_RESEND_API_KEY"
 	MANGOMAIL_LOG_LEVEL      = "MANGOMAIL_LOG_LEVEL"
 
 	// File variants
 
+	MANGOMAIL_API_KEY_FILE = "MANGOMAIL_API_KEY_FILE"
+
 	MANGOMAIL_RESEND_API_KEY_FILE = "MANGOMAIL_RESEND_API_KEY_FILE"
 )
 
 func SetDefaults() {
 	// Set defaults based on the TOML definitions.
+
+	viper.SetDefault(CORS_ALLOWED_ORIGINS, "*")
+
+	// no default for MANGOMAIL_API_KEY
 
 	viper.SetDefault(MANGOMAIL_RATE_LIMIT, "2")
 
@@ -40,6 +49,12 @@ func SetDefaults() {
 
 // MangomailConfig holds configuration values for the mangomail service.
 type MangomailConfig struct {
+
+	// Allowed origins for CORS (comma-separated list)
+	CorsAllowedOrigins []string `mapstructure:"CORS_ALLOWED_ORIGINS"`
+
+	// API key for authenticating HTTP API requests. Can be loaded from file using MANGOMAIL_API_KEY_FILE
+	MangomailApiKey RedactedString `mapstructure:"MANGOMAIL_API_KEY"`
 
 	// Maximum number of email requests per second (rate limit)
 	MangomailRateLimit uint64 `mapstructure:"MANGOMAIL_RATE_LIMIT"`
@@ -67,6 +82,20 @@ func LoadMangomailConfig() (*MangomailConfig, error) {
 	var cfg MangomailConfig
 	var err error
 
+	cfg.CorsAllowedOrigins, err = GetCorsAllowedOrigins()
+	if err != nil && err != ErrNotDefined {
+		return nil, fmt.Errorf("failed to get CORS_ALLOWED_ORIGINS: %w", err)
+	} else if err == ErrNotDefined {
+		return nil, fmt.Errorf("CORS_ALLOWED_ORIGINS is required for the mangomail service: %w", err)
+	}
+
+	cfg.MangomailApiKey, err = GetMangomailApiKey()
+	if err != nil && err != ErrNotDefined {
+		return nil, fmt.Errorf("failed to get MANGOMAIL_API_KEY: %w", err)
+	} else if err == ErrNotDefined {
+		return nil, fmt.Errorf("MANGOMAIL_API_KEY is required for the mangomail service: %w", err)
+	}
+
 	cfg.MangomailRateLimit, err = GetMangomailRateLimit()
 	if err != nil && err != ErrNotDefined {
 		return nil, fmt.Errorf("failed to get MANGOMAIL_RATE_LIMIT: %w", err)
@@ -89,6 +118,41 @@ func LoadMangomailConfig() (*MangomailConfig, error) {
 	}
 
 	return &cfg, nil
+}
+
+// GetCorsAllowedOrigins returns the value for the environment variable CORS_ALLOWED_ORIGINS.
+func GetCorsAllowedOrigins() ([]string, error) {
+	s := viper.GetString(CORS_ALLOWED_ORIGINS)
+	if s == "" {
+		return []string{"*"}, nil // Default to allow all
+	}
+
+	origins := strings.Split(s, ",")
+	for i, origin := range origins {
+		origins[i] = strings.TrimSpace(origin)
+	}
+	return origins, nil
+}
+
+// GetMangomailApiKey returns the value for the environment variable MANGOMAIL_API_KEY.
+func GetMangomailApiKey() (RedactedString, error) {
+	s := viper.GetString(MANGOMAIL_API_KEY)
+	if s == "" {
+		filename := viper.GetString(MANGOMAIL_API_KEY_FILE)
+		contents, err := os.ReadFile(filename)
+		if err != nil {
+			return notDefinedRedactedString(), fmt.Errorf("failed to parse %s: %w", MANGOMAIL_API_KEY_FILE, err)
+		}
+		s = strings.TrimSpace(string(contents))
+	}
+	if s != "" {
+		v, err := toRedactedString(s)
+		if err != nil {
+			return v, fmt.Errorf("failed to parse %s: %w", MANGOMAIL_API_KEY, err)
+		}
+		return v, nil
+	}
+	return notDefinedRedactedString(), fmt.Errorf("%s: %w", MANGOMAIL_API_KEY, ErrNotDefined)
 }
 
 // GetMangomailRateLimit returns the value for the environment variable MANGOMAIL_RATE_LIMIT.

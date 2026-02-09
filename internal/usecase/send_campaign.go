@@ -5,8 +5,6 @@ import (
 	"log/slog"
 	"os"
 	"path/filepath"
-	"regexp"
-	"strings"
 	"time"
 
 	"github.com/TheMagicMango/mangomail/internal/infra/reader"
@@ -115,8 +113,8 @@ func (uc *SendCampaignUseCase) sendEmailsInBatches(input SendCampaignInputDTO, h
 			emailReq := &resend.SendEmailRequest{
 				From:        input.From,
 				To:          []string{row["email"].(string)},
-				Subject:     uc.replacePlaceholders(input.Subject, row),
-				Html:        uc.replacePlaceholders(htmlContent, row),
+				Subject:     replacePlaceholders(input.Subject, row),
+				Html:        replacePlaceholders(htmlContent, row),
 				Attachments: attachments,
 			}
 
@@ -196,18 +194,4 @@ func (uc *SendCampaignUseCase) generateReport(
 
 	slog.Info("Report generated", "path", reportPath)
 	return nil
-}
-
-func (uc *SendCampaignUseCase) replacePlaceholders(text string, row map[string]interface{}) string {
-	re := regexp.MustCompile(`\{\{(\s*\w+\s*)\}\}`)
-
-	return re.ReplaceAllStringFunc(text, func(match string) string {
-		fieldName := strings.TrimSpace(match[2 : len(match)-2])
-
-		if value, ok := row[fieldName]; ok {
-			return fmt.Sprintf("%v", value)
-		}
-
-		return match
-	})
 }

@@ -10,6 +10,21 @@ This file documents the configuration options.
 
 <!-- markdownlint-disable MD012 -->
 
+## `CORS_ALLOWED_ORIGINS`
+
+Allowed origins for CORS (comma-separated list)
+
+* **Type:** `string`
+* **Default:** `"*"`
+* **Used by:** mangomail
+
+## `MANGOMAIL_API_KEY`
+
+API key for authenticating HTTP API requests. Can be loaded from file using MANGOMAIL_API_KEY_FILE
+
+* **Type:** `RedactedString`
+* **Used by:** mangomail
+
 ## `MANGOMAIL_RATE_LIMIT`
 
 Maximum number of email requests per second (rate limit)

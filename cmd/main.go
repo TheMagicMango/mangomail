@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"github.com/TheMagicMango/mangomail/cmd/root"
+	_ "github.com/TheMagicMango/mangomail/cmd/serve"
 )
 
 func main() {
