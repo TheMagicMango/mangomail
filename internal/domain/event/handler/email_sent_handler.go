@@ -48,6 +48,7 @@ func (h *EmailSentHandler) Handle(ev events.EventInterface, wg *sync.WaitGroup) 
 
 	slog.Info("Email sent successfully",
 		"to", email.To,
+		"from", email.From,
 		"subject", email.Subject,
 		"id", sent.Id)
 }

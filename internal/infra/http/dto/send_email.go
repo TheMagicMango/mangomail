@@ -2,6 +2,7 @@ package dto
 
 type SendEmailRequest struct {
 	To         string `json:"to" validate:"required,email"`
+	From       string `json:"from"`
 	Name       string `json:"name" validate:"max=100"`
 	Subject    string `json:"subject" validate:"required,min=1,max=200"`
 	Saudacao   string `json:"saudacao" validate:"max=500"`

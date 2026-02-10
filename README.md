@@ -128,13 +128,23 @@ Send a single email using the configured template.
 ```json
 {
   "to": "recipient@example.com",
+  "from": "custom@example.com",
   "name": "John Doe",
   "subject": "Welcome to our service",
   "saudacao": "Hi John,",
   "body": "Thank you for signing up!",
-  "assinatura": "Best regards,\nThe Team"
+  "assinatura": "Best regards,\\nThe Team"
 }
 ```
+
+**Fields:**
+- `to` (required): Recipient email address
+- `from` (optional): Sender email address. If omitted, uses the default `--from` value from server startup
+- `name` (optional): Recipient name for template placeholders
+- `subject` (required): Email subject line (supports `{{placeholders}}`)
+- `saudacao` (optional): Greeting text for template
+- `body` (required): Main email body content for template
+- `assinatura` (optional): Signature text for template
 
 **Response (Success):**
 ```json

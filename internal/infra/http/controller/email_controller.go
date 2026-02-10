@@ -47,6 +47,11 @@ func (c *EmailController) SendEmail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	from := c.From
+	if req.From != "" {
+		from = req.From
+	}
+
 	err := c.SendEmailUseCase.Execute(usecase.SendEmailInputDTO{
 		To:           req.To,
 		Name:         req.Name,
@@ -54,7 +59,7 @@ func (c *EmailController) SendEmail(w http.ResponseWriter, r *http.Request) {
 		Saudacao:     req.Saudacao,
 		Body:         req.Body,
 		Assinatura:   req.Assinatura,
-		From:         c.From,
+		From:         from,
 		HTMLTemplate: c.HTMLTemplate,
 	})
 	if err != nil {
