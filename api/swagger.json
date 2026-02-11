@@ -4,7 +4,7 @@
         "description": "HTTP API for sending emails programmatically via Resend",
         "title": "MangoMail API",
         "contact": {
-            "name": "The Magic Mango",
+            "name": "Magic Mango",
             "url": "https://github.com/TheMagicMango/mangomail"
         },
         "license": {
@@ -13,7 +13,7 @@
         },
         "version": "1.0"
     },
-    "host": "localhost:8081",
+    "host": "mangomail.up.railway.app",
     "basePath": "/",
     "paths": {
         "/api/v1/send": {

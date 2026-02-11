@@ -37,10 +37,10 @@ definitions:
     - subject
     - to
     type: object
-host: localhost:8081
+host: mangomail.up.railway.app
 info:
   contact:
-    name: The Magic Mango
+    name: Magic Mango
     url: https://github.com/TheMagicMango/mangomail
   description: HTTP API for sending emails programmatically via Resend
   license:

@@ -48,7 +48,7 @@ mangomail serve --port 3000`
 // @license.name  Apache 2.0
 // @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
 //
-// @host      localhost:8081
+// @host      mangomail.up.railway.app
 // @BasePath  /
 //
 // @securityDefinitions.apikey ApiKeyAuth

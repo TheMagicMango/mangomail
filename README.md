@@ -65,9 +65,8 @@ docker run --rm \
 
 **Using local installation:**
 ```bash
-export MANGOMAIL_RESEND_API_KEY_FILE=~/.mangomail/secrets/resend_api_key
-export MANGOMAIL_API_KEY_FILE=~/.mangomail/secrets/api_key
-mangomail serve
+./mangomail serve --resend-api-key-file ~/.mangomail/secrets/resend_api_key \
+  --api-key-file ~/.mangomail/secrets/api_key
 ```
 
 **Using Docker:**
@@ -99,54 +98,3 @@ curl -X POST http://localhost:8081/api/v1/send \
 | `MANGOMAIL_TELEMETRY_ADDRESS` | Health check server address | `:8080` |
 | `MANGOMAIL_RESEND_RATE_LIMIT` | Max emails per second | `2` |
 | `MANGOMAIL_LOG_LEVEL` | Log level | `info` |
-
-## Commands
-
-### send
-
-```bash
-mangomail send CAMPAIGN_NAME \
-  --html FILE \
-  --sample FILE \
-  --from EMAIL \
-  --subject TEXT \
-  [--reply-to EMAIL] \
-  [--attachments URLS]
-```
-
-### serve
-
-```bash
-mangomail serve [--port PORT]
-```
-
-Health checks: `:8080/livez` and `:8080/readyz`
-
-## API
-
-### POST /api/v1/send
-
-```json
-{
-  "from": "sender@example.com",
-  "to": "recipient@example.com",
-  "subject": "Subject line",
-  "reply_to": "reply@example.com",
-  "attachments": ["https://example.com/file.pdf"]
-}
-```
-
-Headers: `Content-Type: application/json`, `X-API-Key: <key>`
-
-## Templates
-
-CSV with `email` column + HTML with `{{placeholder}}` syntax:
-
-```csv
-email,name
-alice@example.com,Alice
-```
-
-```html
-<h1>Hello {{name}}!</h1>
-```

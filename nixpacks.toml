@@ -1,0 +1,11 @@
+# Disable auto-detection, just download the pre-built binary
+providers = []
+
+[phases.setup]
+nixPkgs = ["curl", "gnutar", "gzip"]
+
+[phases.install]
+cmds = ["curl -sL https://github.com/TheMagicMango/mangomail/releases/download/v0.1.1/mangomail_0.1.1_linux_amd64.tar.gz | tar xz"]
+
+[start]
+cmd = "./mangomail serve"
