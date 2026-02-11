@@ -10,12 +10,51 @@ This file documents the configuration options.
 
 <!-- markdownlint-disable MD012 -->
 
-## `MANGOMAIL_RATE_LIMIT`
+## `MANGOMAIL_API_KEY`
 
-Maximum number of email requests per second (rate limit)
+API key for authenticating HTTP API requests. Can be loaded from file using MANGOMAIL_API_KEY_FILE
 
-* **Type:** `uint64`
-* **Default:** `"2"`
+* **Type:** `RedactedString`
+* **Used by:** mangomail
+
+## `MANGOMAIL_HTTP_ADDRESS`
+
+HTTP server address and port for the API server
+
+* **Type:** `string`
+* **Default:** `":8081"`
+* **Used by:** mangomail
+
+## `MANGOMAIL_HTTP_MAX_RETRIES`
+
+Maximum number of retry attempts for HTTP server startup after encountering an error.
+
+* **Type:** `int`
+* **Default:** `"3"`
+* **Used by:** mangomail
+
+## `MANGOMAIL_HTTP_RETRY_INTERVAL`
+
+Wait time between HTTP server startup retry attempts.
+
+* **Type:** `Duration`
+* **Default:** `"5"`
+* **Used by:** mangomail
+
+## `MANGOMAIL_MAX_STARTUP_TIME`
+
+Maximum startup time for the service
+
+* **Type:** `Duration`
+* **Default:** `"10"`
+* **Used by:** mangomail
+
+## `MANGOMAIL_TELEMETRY_ADDRESS`
+
+Telemetry server address and port for health checks and metrics
+
+* **Type:** `string`
+* **Default:** `":8080"`
 * **Used by:** mangomail
 
 ## `MANGOMAIL_RESEND_API_KEY`
@@ -23,6 +62,22 @@ Maximum number of email requests per second (rate limit)
 Resend API key for sending emails. Can be loaded from file using MANGOMAIL_RESEND_API_KEY_FILE
 
 * **Type:** `RedactedString`
+* **Used by:** mangomail
+
+## `MANGOMAIL_RESEND_RATE_LIMIT`
+
+Maximum number of email requests per second (rate limit)
+
+* **Type:** `int`
+* **Default:** `"2"`
+* **Used by:** mangomail
+
+## `MANGOMAIL_LOG_COLOR`
+
+Log color for the service
+
+* **Type:** `bool`
+* **Default:** `"true"`
 * **Used by:** mangomail
 
 ## `MANGOMAIL_LOG_LEVEL`

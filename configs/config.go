@@ -1,3 +1,6 @@
+// (c) Magic Mango and individual authors
+// SPDX-License-Identifier: Apache-2.0
+
 package configs
 
 import (
@@ -41,6 +44,11 @@ func ToStringFromString(s string) (string, error) {
 	return s, nil
 }
 
+func ToIntFromString(s string) (int, error) {
+	value, err := strconv.ParseInt(s, 10, 64)
+	return int(value), err
+}
+
 func ToDurationFromSeconds(s string) (time.Duration, error) {
 	return time.ParseDuration(s + "s")
 }
@@ -81,6 +89,7 @@ var (
 	toBool           = strconv.ParseBool
 	toUint64         = ToUint64FromString
 	toString         = ToStringFromString
+	toInt            = ToIntFromString
 	toDuration       = ToDurationFromSeconds
 	toLogLevel       = ToLogLevelFromString
 	toRedactedString = ToRedactedStringFromString
@@ -92,6 +101,7 @@ var (
 	notDefinedbool           = func() bool { return false }
 	notDefineduint64         = func() uint64 { return 0 }
 	notDefinedstring         = func() string { return "" }
+	notDefinedint            = func() int { return 0 }
 	notDefinedDuration       = func() time.Duration { return 0 }
 	notDefinedLogLevel       = func() slog.Level { return slog.LevelInfo }
 	notDefinedRedactedString = func() RedactedString { return RedactedString{""} }

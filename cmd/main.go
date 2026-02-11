@@ -1,3 +1,7 @@
+// (c) Magic Mango and individual authors
+// SPDX-License-Identifier: Apache-2.0
+
+// This package contains the mangomail CLI binary.
 package main
 
 import (

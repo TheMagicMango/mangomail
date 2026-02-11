@@ -1,3 +1,6 @@
+// (c) Magic Mango and individual authors
+// SPDX-License-Identifier: Apache-2.0
+
 package handler
 
 import (
@@ -19,7 +22,7 @@ func NewEmailSentHandler(client *resend.Client) *EmailSentHandler {
 	}
 }
 
-func (h *EmailSentHandler) Handle(ev events.EventInterface, wg *sync.WaitGroup) {
+func (h *EmailSentHandler) Handle(ev events.EventInterface, wg *sync.WaitGroup) error {
 	defer wg.Done()
 
 	payload := ev.GetPayload()
@@ -27,27 +30,33 @@ func (h *EmailSentHandler) Handle(ev events.EventInterface, wg *sync.WaitGroup) 
 	payloadBytes, err := json.Marshal(payload)
 	if err != nil {
 		slog.Error("Failed to marshal email", "error", err)
-		return
+		return err
 	}
 
 	var email resend.SendEmailRequest
 	err = json.Unmarshal(payloadBytes, &email)
 	if err != nil {
 		slog.Error("Failed to unmarshal email", "error", err)
-		return
+		return err
 	}
 
 	sent, err := h.ResendClient.Emails.Send(&email)
 	if err != nil {
 		slog.Error("Failed to send email",
 			"to", email.To,
+			"reply_to", email.ReplyTo,
+			"from", email.From,
 			"subject", email.Subject,
 			"error", err)
-		return
+		return err
 	}
 
 	slog.Info("Email sent successfully",
 		"to", email.To,
+		"reply_to", email.ReplyTo,
+		"from", email.From,
 		"subject", email.Subject,
 		"id", sent.Id)
+
+	return nil
 }
