@@ -1,3 +1,6 @@
+// (c) Magic Mango and individual authors
+// SPDX-License-Identifier: Apache-2.0
+
 package events
 
 import (
@@ -37,8 +40,9 @@ type TestEventHandler struct {
 	ID int
 }
 
-func (h *TestEventHandler) Handle(event EventInterface, wg *sync.WaitGroup) {
+func (h *TestEventHandler) Handle(event EventInterface, wg *sync.WaitGroup) error {
 	defer wg.Done()
+	return nil
 }
 
 // EventDispatcherTestSuite contains all test cases for the EventDispatcher.
@@ -149,9 +153,10 @@ type MockHandler struct {
 	mock.Mock
 }
 
-func (m *MockHandler) Handle(event EventInterface, wg *sync.WaitGroup) {
+func (m *MockHandler) Handle(event EventInterface, wg *sync.WaitGroup) error {
 	m.Called(event)
 	wg.Done()
+	return nil
 }
 
 func (suite *EventDispatcherTestSuite) TestEventDispatcher_Dispatch() {
@@ -164,7 +169,8 @@ func (suite *EventDispatcherTestSuite) TestEventDispatcher_Dispatch() {
 	suite.eventDispatcher.Register(suite.event.GetName(), eh)
 	suite.eventDispatcher.Register(suite.event.GetName(), eh2)
 
-	suite.eventDispatcher.Dispatch(&suite.event)
+	errs := suite.eventDispatcher.Dispatch(&suite.event)
+	suite.Nil(errs)
 
 	eh.AssertExpectations(suite.T())
 	eh2.AssertExpectations(suite.T())

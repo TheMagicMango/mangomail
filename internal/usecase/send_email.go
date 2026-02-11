@@ -1,3 +1,6 @@
+// (c) Magic Mango and individual authors
+// SPDX-License-Identifier: Apache-2.0
+
 package usecase
 
 import (
@@ -9,14 +12,12 @@ import (
 )
 
 type SendEmailInputDTO struct {
-	To           string
-	Name         string
-	Subject      string
-	Saudacao     string
-	Body         string
-	Assinatura   string
-	From         string
-	HTMLTemplate string
+	To          string   `json:"to" validate:"required"`
+	From        string   `json:"from" validate:"required"`
+	Html        string   `json:"html" validate:"required"`
+	Subject     string   `json:"subject" validate:"required"`
+	ReplyTo     string   `json:"reply_to"`
+	Attachments []string `json:"attachments"`
 }
 
 type SendEmailUseCase struct {
@@ -30,29 +31,20 @@ func NewSendEmailUseCase(eventDispatcher events.EventDispatcherInterface) *SendE
 }
 
 func (uc *SendEmailUseCase) Execute(input SendEmailInputDTO) error {
-	placeholders := map[string]interface{}{
-		"name":       input.Name,
-		"subject":    input.Subject,
-		"saudacao":   input.Saudacao,
-		"body":       input.Body,
-		"assinatura": input.Assinatura,
-	}
-
-	html := replacePlaceholders(input.HTMLTemplate, placeholders)
-	subject := replacePlaceholders(input.Subject, placeholders)
-
-	emailReq := &resend.SendEmailRequest{
+	email := &resend.SendEmailRequest{
 		From:    input.From,
 		To:      []string{input.To},
-		Subject: subject,
-		Html:    html,
+		ReplyTo: input.ReplyTo,
+		Subject: input.Subject,
+		Html:    input.Html,
 	}
 
 	emailSentEvent := event.NewEmailSent()
-	emailSentEvent.SetPayload(emailReq)
+	emailSentEvent.SetPayload(email)
 
-	if err := uc.EventDispatcher.Dispatch(emailSentEvent); err != nil {
-		return fmt.Errorf("failed to dispatch email event: %w", err)
+	errs := uc.EventDispatcher.Dispatch(emailSentEvent)
+	if len(errs) > 0 {
+		return fmt.Errorf("failed to dispatch email event: %w", errs[0])
 	}
 
 	return nil
