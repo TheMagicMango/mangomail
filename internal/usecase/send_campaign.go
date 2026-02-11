@@ -36,9 +36,6 @@ func NewSendCampaignUseCase(
 }
 
 func (uc *SendCampaignUseCase) Execute(input SendCampaignInputDTO, htmlContent string, csvRows []map[string]interface{}, rateLimit int) error {
-	startTime := time.Now()
-
-	// Prepare attachments
 	var attachments []*resend.Attachment
 	if len(input.Attachments) > 0 {
 		attachments = make([]*resend.Attachment, len(input.Attachments))
@@ -47,7 +44,6 @@ func (uc *SendCampaignUseCase) Execute(input SendCampaignInputDTO, htmlContent s
 		}
 	}
 
-	// Send emails in batches
 	batchSize := rateLimit
 	totalRows := len(csvRows)
 
@@ -66,7 +62,6 @@ func (uc *SendCampaignUseCase) Execute(input SendCampaignInputDTO, htmlContent s
 				continue
 			}
 
-			// Replace placeholders inline
 			subject := input.Subject
 			html := htmlContent
 			for key, value := range row {
@@ -100,9 +95,6 @@ func (uc *SendCampaignUseCase) Execute(input SendCampaignInputDTO, htmlContent s
 			time.Sleep(time.Second)
 		}
 	}
-
-	duration := time.Since(startTime)
-	slog.Info("Campaign completed", "duration", duration)
 
 	return nil
 }

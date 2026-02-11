@@ -31,12 +31,21 @@ func NewSendEmailUseCase(eventDispatcher events.EventDispatcherInterface) *SendE
 }
 
 func (uc *SendEmailUseCase) Execute(input SendEmailInputDTO) error {
+	var attachments []*resend.Attachment
+	if len(input.Attachments) > 0 {
+		attachments = make([]*resend.Attachment, len(input.Attachments))
+		for i, url := range input.Attachments {
+			attachments[i] = &resend.Attachment{Path: url}
+		}
+	}
+
 	email := &resend.SendEmailRequest{
-		From:    input.From,
-		To:      []string{input.To},
-		ReplyTo: input.ReplyTo,
-		Subject: input.Subject,
-		Html:    input.Html,
+		From:        input.From,
+		To:          []string{input.To},
+		ReplyTo:     input.ReplyTo,
+		Subject:     input.Subject,
+		Html:        input.Html,
+		Attachments: attachments,
 	}
 
 	emailSentEvent := event.NewEmailSent()

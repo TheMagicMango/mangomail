@@ -99,7 +99,7 @@ func Create(ctx context.Context, createInfo *CreateInfo) (*Service, error) {
 		maxRetries := createInfo.Config.HttpMaxRetries
 		retryInterval := createInfo.Config.HttpRetryInterval
 		s.Logger.Info("Listening", "address", createInfo.Config.HttpAddress)
-		var err error = nil
+		var err error
 		for retry := 0; retry <= maxRetries; retry++ {
 			switch err = server.ListenAndServe(); err {
 			case http.ErrServerClosed:
@@ -108,8 +108,7 @@ func Create(ctx context.Context, createInfo *CreateInfo) (*Service, error) {
 				s.Logger.Error("http",
 					"error", err,
 					"try", retry+1,
-					"maxRetries", maxRetries,
-					"error", err)
+					"maxRetries", maxRetries)
 			}
 			time.Sleep(retryInterval)
 		}

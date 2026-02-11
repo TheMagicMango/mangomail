@@ -310,7 +310,7 @@ func (s *Service) CreateDefaultTelemetry(
 		ErrorLog: slog.NewLogLogger(s.Logger.Handler(), slog.LevelError),
 	}
 	return server, func() error {
-		var err error = nil
+		var err error
 		for retry := 0; retry < maxRetries+1; retry++ {
 			switch err = server.ListenAndServe(); err {
 			case http.ErrServerClosed:
@@ -319,8 +319,7 @@ func (s *Service) CreateDefaultTelemetry(
 				s.Logger.Error("http",
 					"error", err,
 					"try", retry+1,
-					"maxRetries", maxRetries,
-					"error", err)
+					"maxRetries", maxRetries)
 			}
 			time.Sleep(retryInterval)
 		}
