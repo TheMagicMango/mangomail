@@ -1,3 +1,6 @@
+// (c) Magic Mango and individual authors
+// SPDX-License-Identifier: Apache-2.0
+
 package events
 
 import (
@@ -21,18 +24,34 @@ func NewEventDispatcher() *EventDispatcher {
 }
 
 // Dispatch sends an event to all registered handlers for that event type.
-// Handlers are executed concurrently using goroutines and wait groups.
-func (ed *EventDispatcher) Dispatch(event EventInterface) error {
+// Handlers are executed concurrently and all are allowed to complete.
+// Returns a list of errors from all handlers after all have finished processing.
+func (ed *EventDispatcher) Dispatch(event EventInterface) []error {
 	ed.mu.RLock()
 	defer ed.mu.RUnlock()
 
 	if handlers, ok := ed.handlers[event.GetName()]; ok {
 		wg := &sync.WaitGroup{}
+		errChan := make(chan error, len(handlers))
+
 		for _, handler := range handlers {
 			wg.Add(1)
-			go handler.Handle(event, wg)
+			go func(h EventHandlerInterface) {
+				if err := h.Handle(event, wg); err != nil {
+					errChan <- err
+				}
+			}(handler)
 		}
+
 		wg.Wait()
+		close(errChan)
+
+		var errs []error
+		for e := range errChan {
+			errs = append(errs, e)
+		}
+
+		return errs
 	}
 	return nil
 }
