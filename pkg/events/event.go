@@ -1,3 +1,6 @@
+// (c) Magic Mango and individual authors
+// SPDX-License-Identifier: Apache-2.0
+
 package events
 
 import (
@@ -15,13 +18,13 @@ type EventInterface interface {
 
 // EventHandlerInterface represents a handler that processes events.
 type EventHandlerInterface interface {
-	Handle(event EventInterface, wg *sync.WaitGroup)
+	Handle(event EventInterface, wg *sync.WaitGroup) error
 }
 
 // EventDispatcherInterface represents the event dispatcher that manages event handlers.
 type EventDispatcherInterface interface {
 	Register(eventName string, handler EventHandlerInterface) error
-	Dispatch(event EventInterface) error
+	Dispatch(event EventInterface) []error
 	Remove(eventName string, handler EventHandlerInterface) error
 	Has(eventName string, handler EventHandlerInterface) bool
 	Clear()

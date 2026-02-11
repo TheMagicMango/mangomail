@@ -37,7 +37,9 @@ ARG TARGETARCH
 # source code into the container.
 RUN --mount=type=cache,target=/go/pkg/mod/ \
     --mount=type=bind,target=. \
-    CGO_ENABLED=1 GOARCH=$TARGETARCH go build -tags musl -ldflags '-extldflags "-static"' -o /bin/app /src/cmd
+    CGO_ENABLED=1 GOARCH=$TARGETARCH go build -tags musl \
+    -ldflags "-extldflags '-static' -X github.com/TheMagicMango/mangomail/internal/infra/version.BuildVersion=${VERSION}" \
+    -o /bin/mangomail ./cmd
 
 ################################################################################
 # Create a new stage for running the application that contains the minimal
@@ -75,7 +77,7 @@ RUN adduser \
 USER appuser
 
 # Copy the executable from the "build" stage.
-COPY --from=build /bin/app /bin/
+COPY --from=build /bin/mangomail /bin/
 
 # What the container should run when it is started.
-ENTRYPOINT [ "/bin/app" ]
+ENTRYPOINT [ "/bin/mangomail" ]

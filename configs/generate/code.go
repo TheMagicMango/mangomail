@@ -1,3 +1,6 @@
+// (c) Magic Mango and individual authors
+// SPDX-License-Identifier: Apache-2.0
+
 package main
 
 import (
@@ -19,7 +22,7 @@ var funcMap = template.FuncMap{
 		words := strings.FieldsFunc(env, func(r rune) bool {
 			return r == '_'
 		})
-		if len(words) > 1 && words[0] == "CONGO" {
+		if len(words) > 1 && words[0] == "MANGOMAIL" {
 			words = words[1:]
 		}
 		for i, word := range words {
@@ -28,7 +31,7 @@ var funcMap = template.FuncMap{
 		return strings.Join(words, "")
 	},
 	"toConstName": func(s string) string {
-		return strings.TrimPrefix(s, "CONGO_")
+		return strings.TrimPrefix(s, "MANGOMAIL_")
 	},
 	"hasPrefix": func(prefix, s string) bool {
 		return strings.HasPrefix(s, prefix)

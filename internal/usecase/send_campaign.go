@@ -1,104 +1,54 @@
+// (c) Magic Mango and individual authors
+// SPDX-License-Identifier: Apache-2.0
+
 package usecase
 
 import (
 	"fmt"
 	"log/slog"
-	"os"
-	"path/filepath"
+	"strings"
 	"time"
 
-	"github.com/TheMagicMango/mangomail/internal/infra/reader"
 	"github.com/TheMagicMango/mangomail/pkg/events"
 	"github.com/resend/resend-go/v2"
 )
 
 type SendCampaignInputDTO struct {
-	CampaignName string
-	HTMLPath     string
-	SamplePath   string
-	From         string
-	Subject      string
-	ReplyTo      string
-	Attachments  []string
-	RateLimit    uint64
-}
-
-type SendCampaignOutputDTO struct {
-	CampaignName    string
-	TotalRecipients int
-	SentCount       int
-	FailCount       int
-	Duration        time.Duration
+	From        string   `json:"from" validate:"required"`
+	Subject     string   `json:"subject" validate:"required"`
+	ReplyTo     string   `json:"reply_to"`
+	Attachments []string `json:"attachments"`
 }
 
 type SendCampaignUseCase struct {
 	EmailSentEvent  events.EventInterface
 	EventDispatcher events.EventDispatcherInterface
-	Reader          reader.Reader
 }
 
 func NewSendCampaignUseCase(
 	emailSentEvent events.EventInterface,
 	eventDispatcher events.EventDispatcherInterface,
-	fileReader reader.Reader,
 ) *SendCampaignUseCase {
 	return &SendCampaignUseCase{
 		EmailSentEvent:  emailSentEvent,
 		EventDispatcher: eventDispatcher,
-		Reader:          fileReader,
 	}
 }
 
-func (uc *SendCampaignUseCase) Execute(input SendCampaignInputDTO) (*SendCampaignOutputDTO, error) {
+func (uc *SendCampaignUseCase) Execute(input SendCampaignInputDTO, htmlContent string, csvRows []map[string]interface{}, rateLimit int) error {
 	startTime := time.Now()
 
-	htmlContent, err := uc.Reader.LoadHTML(input.HTMLPath)
-	if err != nil {
-		return nil, fmt.Errorf("failed to load HTML: %w", err)
+	// Prepare attachments
+	var attachments []*resend.Attachment
+	if len(input.Attachments) > 0 {
+		attachments = make([]*resend.Attachment, len(input.Attachments))
+		for i, url := range input.Attachments {
+			attachments[i] = &resend.Attachment{Path: url}
+		}
 	}
 
-	csvRows, err := uc.Reader.LoadCSV(input.SamplePath)
-	if err != nil {
-		return nil, fmt.Errorf("failed to load CSV: %w", err)
-	}
-
-	attachments := uc.prepareAttachments(input.Attachments)
-
-	if err := uc.sendEmailsInBatches(input, htmlContent, csvRows, attachments); err != nil {
-		return nil, err
-	}
-
-	duration := time.Since(startTime)
-
-	if err := uc.generateReport(input, len(csvRows), startTime, time.Now(), duration); err != nil {
-		return nil, fmt.Errorf("failed to generate report: %w", err)
-	}
-
-	slog.Info("Campaign completed", "campaign", input.CampaignName, "duration", duration)
-
-	return &SendCampaignOutputDTO{
-		CampaignName:    input.CampaignName,
-		TotalRecipients: len(csvRows),
-		SentCount:       len(csvRows),
-		FailCount:       0,
-		Duration:        duration,
-	}, nil
-}
-
-func (uc *SendCampaignUseCase) prepareAttachments(urls []string) []*resend.Attachment {
-	if len(urls) == 0 {
-		return nil
-	}
-
-	attachments := make([]*resend.Attachment, len(urls))
-	for i, url := range urls {
-		attachments[i] = &resend.Attachment{Path: url}
-	}
-	return attachments
-}
-
-func (uc *SendCampaignUseCase) sendEmailsInBatches(input SendCampaignInputDTO, htmlContent string, csvRows []map[string]interface{}, attachments []*resend.Attachment) error {
-	batchSize := int(input.RateLimit)
+	// Send emails in batches
+	batchSize := rateLimit
 	totalRows := len(csvRows)
 
 	for i := 0; i < totalRows; i += batchSize {
@@ -110,11 +60,27 @@ func (uc *SendCampaignUseCase) sendEmailsInBatches(input SendCampaignInputDTO, h
 		batch := csvRows[i:end]
 
 		for _, row := range batch {
+			email, ok := row["email"].(string)
+			if !ok || email == "" {
+				slog.Warn("Skipping row with invalid email", "row", row)
+				continue
+			}
+
+			// Replace placeholders inline
+			subject := input.Subject
+			html := htmlContent
+			for key, value := range row {
+				placeholder := fmt.Sprintf("{{%s}}", key)
+				valueStr := fmt.Sprint(value)
+				subject = strings.ReplaceAll(subject, placeholder, valueStr)
+				html = strings.ReplaceAll(html, placeholder, valueStr)
+			}
+
 			emailReq := &resend.SendEmailRequest{
 				From:        input.From,
-				To:          []string{row["email"].(string)},
-				Subject:     replacePlaceholders(input.Subject, row),
-				Html:        replacePlaceholders(htmlContent, row),
+				To:          []string{email},
+				Subject:     subject,
+				Html:        html,
 				Attachments: attachments,
 			}
 
@@ -123,8 +89,9 @@ func (uc *SendCampaignUseCase) sendEmailsInBatches(input SendCampaignInputDTO, h
 			}
 
 			uc.EmailSentEvent.SetPayload(emailReq)
-			if err := uc.EventDispatcher.Dispatch(uc.EmailSentEvent); err != nil {
-				slog.Error("Failed to dispatch email event", "email", row["email"], "error", err)
+			errs := uc.EventDispatcher.Dispatch(uc.EmailSentEvent)
+			for _, err := range errs {
+				slog.Error("Failed to send email", "email", email, "error", err)
 			}
 		}
 
@@ -134,64 +101,8 @@ func (uc *SendCampaignUseCase) sendEmailsInBatches(input SendCampaignInputDTO, h
 		}
 	}
 
-	return nil
-}
+	duration := time.Since(startTime)
+	slog.Info("Campaign completed", "duration", duration)
 
-func (uc *SendCampaignUseCase) generateReport(
-	input SendCampaignInputDTO,
-	totalRecipients int,
-	startTime, endTime time.Time,
-	duration time.Duration,
-) error {
-	reportDir := ".mangomail"
-	if err := os.MkdirAll(reportDir, 0755); err != nil {
-		return fmt.Errorf("failed to create report directory: %w", err)
-	}
-
-	timestamp := time.Now().Format("20060102-150405")
-	reportPath := filepath.Join(reportDir, fmt.Sprintf("%s.md", timestamp))
-
-	content := fmt.Sprintf(`# Email Campaign Report: %s
-
-**Generated:** %s
-
-## Campaign Details
-- **Campaign Name:** %s
-- **HTML Template:** %s
-- **CSV File:** %s
-- **From:** %s
-- **Subject:** %s
-- **Attachments:** %v
-
-## Statistics
-- **Total Recipients:** %d
-
-## Execution Summary
-- **Started at:** %s
-- **Completed at:** %s
-- **Duration:** %s
-
----
-*Generated by MangoMail*
-`,
-		input.CampaignName,
-		time.Now().Format(time.RFC3339),
-		input.CampaignName,
-		input.HTMLPath,
-		input.SamplePath,
-		input.From,
-		input.Subject,
-		input.Attachments,
-		totalRecipients,
-		startTime.Format(time.RFC3339),
-		endTime.Format(time.RFC3339),
-		duration.String(),
-	)
-
-	if err := os.WriteFile(reportPath, []byte(content), 0644); err != nil {
-		return fmt.Errorf("failed to write report: %w", err)
-	}
-
-	slog.Info("Report generated", "path", reportPath)
 	return nil
 }
